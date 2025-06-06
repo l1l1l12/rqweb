@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+  <script type="text/javascript" src="/rqweb/turn.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>陆若晴的作品集</title>
+
+  <style>
+    @font-face {
+      font-family: '封面标题';
+      src: url('/rqweb/IslandMoments-Regular.ttf');
+    }
+
+    @font-face {
+      font-family: 'inter';
+      src: url('/rqweb/Inter-VariableFont_opsz,wght.ttf');
+    }
+    @font-face {
+      font-family: 'xbiaoti';
+      src: url('/rqweb/Caveat-VariableFont_wght.ttf');
+    }
+    @font-face {
+      font-family: 'neirong';
+      src: url('/rqweb/Caveat-Imprima-Regular.ttf');
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #flipbook {
+      position: relative;
+      width: calc(min(100vw, 100vh * 16 / 9));
+      height: calc(min(100vh, 100vw * 9 / 16));
+      aspect-ratio: 16 / 9;
+      max-width: 1920px;
+      max-height: 1080px;
+      background: #222;
+      overflow: hidden;
+      transform-style: preserve-3d;
+    }
+
+    .page {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      padding: 0 !important;
+      border: none !important;
+      box-shadow: none !important;
+      overflow: hidden;
+      background: transparent !important;
+    }
+
+    .page img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      position: absolute;
+      left: 0; top: 0;
+      background: #222;
+    }
+
+    .page tu {
+      width: 30%;
+      height: 40%;
+      object-fit: contain;
+      position: absolute;
+      left: 0; top: 0;
+      background: #222;
+    }
+
+    .overlay {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+
+    .overlay h1 {
+      font-family: '封面标题';
+      color: white;
+      font-size: 3.3rem;
+      position: absolute;
+      top: 3.5rem;
+      left: 2rem;
+      margin: 0;
+    }
+    #ml1 {
+      font-family: 'xbiaoti';
+      color: white;
+      font-size: 2rem;
+      position: absolute;
+      top: 2rem;
+      left: 1rem;
+      margin: 0;
+    }
+    #ml2 {
+      font-family: 'xbiaoti';
+      color: white;
+      font-size: 1.8rem;
+      position: absolute;
+      top: 6rem;
+      left: 1rem;
+      margin: 0;
+    }
+
+    .overlay p {
+      font-family: 'inter';
+      color: white;
+      font-size: 0.45rem;
+      position: absolute;
+      top: 6.6rem;
+      left: 2.8rem;
+      margin: 0;
+      font-weight: lighter;
+      word-spacing: 1em;
+    }
+
+    .page-3 {
+      position: relative;
+    }
+
+    .page-3 .overlay {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      padding: 5%;
+      box-sizing: border-box;
+    }
+
+    .page-3 .overlay .image-container {
+      flex: 0 0 40%;
+      max-width: 40%;
+      height: 80%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer; 
+    }
+
+    .page-3 .overlay .image-container img {
+      width: 30%;
+      top: 5.5%;
+      left: 5%;
+      width: 35%;
+      height: auto;
+      display: block;
+      object-fit: unset;
+      background: transparent;
+      transition: all 0.8s ease;
+    }
+
+    .page-3 .overlay .image-container img#t1 {
+      opacity: 1;
+      /* z-index handled by flow */
+    }
+    .page-3 .overlay .image-container img#t6{
+      opacity: 1;
+      /* z-index handled by flow */
+    }
+
+
+
+    .page-4 {
+      position: relative;
+    }
+
+    .page-4 .overlay {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      padding: 5%;
+      box-sizing: border-box;
+    }
+
+    .page-4 .overlay .image-container {
+      flex: 0 0 40%;
+      max-width: 40%;
+      height: 80%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer; 
+    }
+    .page-4 .overlay .image-container img {
+      width: 30%;
+      top: 5.5%;
+      left: 5%;
+      width: 35%;
+      height: auto;
+      display: block;
+      object-fit: unset;
+      background: transparent;
+      transition: all 0.8s ease;
+    }
+
+    .page-4 .overlay .image-container img#t1 {
+      opacity: 1;
+      /* z-index handled by flow */
+    }
+
+    /* Style for x series images container */
+    .carousel-container {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      height: 90%;
+      overflow: hidden;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      z-index: 2;
+      background: transparent !important;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Style for x series images */
+    .carousel-container img {
+      position: absolute;
+      max-width: 50%;
+      max-height: 90%;
+      object-fit: contain;
+      opacity: 0;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      background: transparent !important;
+    }
+
+    .carousel-container img.current {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+      z-index: 4;
+    }
+
+    .carousel-container img.side-right {
+      opacity: 0.5;
+      transform: translateX(50%) scale(0.85);
+      z-index: 3;
+    }
+     .carousel-container img.side-left {
+      opacity: 0.5;
+      transform: translateX(-50%) scale(0.85);
+      z-index: 3;
+    }
+     .carousel-container img.far-right {
+      opacity: 0.2;
+      transform: translateX(100%) scale(0.7);
+       z-index: 2;
+    }
+     .carousel-container img.far-left {
+      opacity: 0.2;
+      transform: translateX(-100%) scale(0.7);
+       z-index: 2;
+    }
+
+    .page-3 .overlay .text-container {
+      flex-grow: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-left: 2%;
+      box-sizing: border-box;
+      transition: opacity 0.5s ease;
+    }
+
+    .page-3 .overlay .text-container #tm {
+      font-family: 'xbiaoti';
+      color: rgb(239, 226, 205);
+      font-size: 1.8rem;
+      margin: 0;
+      position: absolute;
+      top: 6%;
+      left: 50%;
+      width: 70%;
+      transition: all 0.8s ease;
+      line-height: 1.2;
+    }
+    .page-3 .overlay .text-container #fbt {
+      font-family: 'neirong';
+      color: rgb(239, 226, 205);
+      font-size: 0.7rem;
+      top: 27%;
+      font-weight: normal;
+      left: 57.3%;
+      line-height: 1.4;
+      word-spacing: 0.1rem;
+      transition: all 0.8s ease;
+      width: 50%;
+      margin: 0.1rem 0 0 0;
+    }
+
+    .page-3 .overlay .text-container #wz {
+      font-family: 'neirong';
+      color: rgb(239, 214, 177);
+      font-size: 0.5rem;
+      top: 41%;
+      font-weight: normal;
+      left: 45%;
+      transition: all 0.8s ease;
+      line-height: 1.4;
+      word-spacing: 0.1rem;
+      width: 50%;
+      opacity: 1;
+      position: absolute;
+      margin: 0.1rem 0 0 0;
+    }
+    .page-3 .overlay .text-container #wz1 {
+      font-family: 'neirong';
+      color: rgb(177, 239, 212);
+      font-size: 0.5rem;
+      transition: all 0.5s ease;
+      top: 41%;
+      font-weight: normal;
+      opacity: 0;
+      position: absolute;
+      left: 45%;
+      line-height: 1.4;
+      word-spacing: 0.1rem;
+      width: 50%;
+      margin: 0.1rem 0 0 0;
+    }
+
+
+    .page-4 .overlay .text-container {
+      flex-grow: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-left: 2%;
+      box-sizing: border-box;
+      transition: opacity 0.5s ease;
+    }
+
+    .page-4 .overlay .text-container #tm {
+      font-family: 'xbiaoti';
+      color: rgb(239, 226, 205);
+      font-size: 1.8rem;
+      margin: 0;
+      position: absolute;
+      top: 6%;
+      left: 63%;
+      width: 70%;
+      transition: all 0.8s ease;
+      line-height: 1.2;
+    }
+    .page-4 .overlay .text-container #fbt {
+      font-family: 'neirong';
+      color: rgb(239, 226, 205);
+      font-size: 0.6rem;
+      top: 27%;
+      font-weight: normal;
+      left: 63%;
+      line-height: 1.4;
+      word-spacing: 0.1rem;
+      transition: all 0.8s ease;
+      width: 40%;
+      margin: 0.1rem 0 0 0;
+    }
+
+    .page-4 .overlay .text-container #wz {
+      font-family: 'neirong';
+      color: rgb(239, 214, 177);
+      font-size: 0.4rem;
+      top: 41%;
+      font-weight: normal;
+      left: 62%;
+      transition: all 0.8s ease;
+      line-height: 1.4;
+      word-spacing: 0.1rem;
+      width: 30%;
+      opacity: 1;
+      position: absolute;
+      margin: 0.1rem 0 0 0;
+    }
+
+
+
+
+    .page-5 {
+      position: relative;
+    }
+
+    .page-5 .overlay {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      padding: 5%;
+      box-sizing: border-box;
+    }
+
+    .page-5 .overlay .image-container {
+      flex: 0 0 40%;
+      max-width: 40%;
+      height: 80%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer; 
+    }
+
+    .page-5 .overlay .image-container img {
+      width: 30%;
+      top: 5.5%;
+      left: 5%;
+      width: 35%;
+      height: auto;
+      display: block;
+      object-fit: unset;
+      background: transparent;
+      transition: all 0.8s ease;
+    }
+
+    .page-5 .overlay .image-container img#t1 {
+      opacity: 1;
+      /* z-index handled by flow */
+    }
+    .page-5 .overlay .text-container {
+      flex-grow: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-left: 2%;
+      box-sizing: border-box;
+      transition: opacity 0.5s ease;
+    }
+
+    .page-5 .overlay .text-container #tm {
+      font-family: 'xbiaoti';
+      color: rgb(239, 226, 205);
+      font-size: 1.7rem;
+      margin: 0;
+      position: absolute;
+      top: 6%;
+      left: 42%;
+      width: 70%;
+      transition: all 0.8s ease;
+      line-height: 1.2;
+    }
+    .page-5 .overlay .text-container #fbt {
+      font-family: 'neirong';
+      color: rgb(239, 226, 205);
+      font-size: 0.6rem;
+      top: 27%;
+      font-weight: normal;
+      left: 48%;
+      line-height: 1.4;
+      word-spacing: 0.1rem;
+      transition: all 0.8s ease;
+      width: 40%;
+      margin: 0.1rem 0 0 0;
+    }
+
+    .page-5 .overlay .text-container #wz {
+      font-family: 'neirong';
+      color: rgb(239, 214, 177);
+      font-size: 0.5rem;
+      top: 41%;
+      font-weight: normal;
+      left: 45%;
+      transition: all 0.8s ease;
+      line-height: 1.4;
+      word-spacing: 0.1rem;
+      width: 50%;
+      opacity: 1;
+      position: absolute;
+      margin: 0.1rem 0 0 0;
+    }
+
+
+
+    .page-6 {
+      position: relative;
+    }
+
+    .page-6 .overlay {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      padding: 5%;
+      box-sizing: border-box;
+    }
+
+    .page-6 .overlay .image-container {
+      flex: 0 0 40%;
+      max-width: 40%;
+      height: 80%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .page-6 .overlay .image-container img {
+      position: absolute;
+      width: 30%;
+      top: 5.5%;
+      left: 5%;
+      width: 35%;
+      height: auto;
+      display: block;
+      object-fit: unset;
+      background: transparent;
+      transition: all 0.8s ease;
+    }
+
+    .page-6 .overlay .image-container img#page6-trigger {
+      position: absolute;
+      top: 50%;
+      left: 39%;
+      transform: translate(-50%, -50%);
+      width: 8%;
+      height: auto;
+      z-index: 10;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+
+    .page-6 .overlay .image-container img#page6-overlay {
+      z-index: 5;
+      /* opacity: 0; */
+      transition: opacity 0.5s ease;
+    }
+
+    .page-6 .overlay .image-container img#page6-main {
+      position: static;
+      width: 100%;
+      height: auto;
+      z-index: 2;
+      display: block;
+      /* 不要写 opacity 和 transition */
+    }
+
+    .page-6 .overlay .text-container {
+      flex-grow: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-left: 2%;
+      box-sizing: border-box;
+      transition: opacity 0.5s ease;
+    }
+
+    .page-6 .overlay .text-container #tm6 {
+      font-family: 'xbiaoti';
+      color: rgb(239, 226, 205);
+      font-size: 1.7rem;
+      margin: 0;
+      position: absolute;
+      top: 6%;
+      left: 42%;
+      width: 70%;
+      transition: all 0.8s ease;
+      line-height: 1.2;
+    }
+    .page-6 .overlay .text-container #fbt6 {
+      font-family: 'neirong';
+      color: rgb(239, 226, 205);
+      font-size: 0.6rem;
+      top: 27%;
+      font-weight: normal;
+      left: 57%;
+      line-height: 1.4;
+      word-spacing: 0.1rem;
+      transition: all 0.8s ease;
+      width: 40%;
+      margin: 0.1rem 0 0 0;
+    }
+
+    .page-6 .overlay .text-container #wz6 {
+      font-family: 'neirong';
+      color: rgb(239, 214, 177);
+      font-size: 0.5rem;
+      top: 41%;
+      font-weight: normal;
+      left: 45%;
+      transition: all 0.8s ease;
+      line-height: 1.4;
+      word-spacing: 0.1rem;
+      width: 50%;
+      opacity: 1;
+      position: absolute;
+      margin: 0.1rem 0 0 0;
+    }
+
+    .transparent-background {
+      background: transparent !important;
+    }
+
+    #page6-trigger {
+      position: absolute;
+      top: 50%;
+      left: 39%;
+      transform: translate(-50%, -50%);
+      width: 30%;
+      height: auto;
+      z-index: 10;
+      pointer-events: auto;
+      cursor: pointer;
+      background: transparent !important;
+    }
+
+    #page6-overlay {
+      position: absolute;
+      left: 5%;
+      top: 5.5%;
+      width: 35%;
+      height: auto;
+      z-index: 3;
+      /* 不要写 opacity 和 transition */
+    }
+
+    #byebye-title {
+      font-size: 5rem;
+      position: absolute;
+      top: 3rem;
+      left: 3.9rem;
+      color: white;
+      font-family: '封面标题', sans-serif;
+      margin: 0;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div id="flipbook">
+    <div class="page">
+      <img src="/rqweb/1.png" alt="背景图" />
+      <div class="overlay">
+        <h1>Portfolio</h1>
+        <p>Luruoqing / Design Works</p>
+      </div>
+    </div>
+    <div class="page">
+      <img src="/rqweb/2.png" alt="目录图" />
+      <div class="overlay">
+        <h2 id="ml1">1.Graphic Design </h2>
+        <h2 id="ml2">2.Product Design </h2>
+      </div>
+    </div>
+    <div class="page page-3">
+      <img src="/rqweb/3.png" alt="背景图" />
+      <div class="overlay">
+        <div class="image-container">
+          <img id="t1" src="/rqweb/t1.png" alt="t1图片" />
+        </div>
+        <div class="text-container">
+          <h2 id="tm">ARRRT APP</h2>
+          <p id="fbt">———Art healing apps</p>
+          <p id="wz">We conducted user research on the ARRRT app for art therapy, obtaining target users and their preferred design styles, as well as the user experience of using the app. We also conducted research on users' opinions on this app and obtained their views on its advantages and disadvantages, which laid the foundation for our future app design</p>
+          <p id="wz1">We have summarized the target users and their needs of ARRRT, designed new usage routes and applied new healing methods to improve and upgrade ARRRT, making its content more diverse and healing effects better. We have also designed a brand new interface and interaction for ARRRT, and the detailed interface can be viewed above</p>
+        </div>
+      </div>
+      <img src="/rqweb/G1.png" alt="G1图片" id="g1-img" class="transparent-background" style="position: absolute; top: 12%; left: 88%; width: 5%; height: auto; background: transparent !important; z-index: 3;"/>
+
+      <!-- Carousel Images Container -->
+      <div class="carousel-container">
+        <img src="/rqweb/x1.png" class="carousel-img" alt="x图片 1"/>
+        <img src="/rqweb/x2.png" class="carousel-img" alt="x图片 2"/>
+        <img src="/rqweb/x3.png" class="carousel-img" alt="x图片 3"/>
+        <img src="/rqweb/x4.png" class="carousel-img" alt="x图片 4"/>
+        <img src="/rqweb/x5.png" class="carousel-img" alt="x图片 5"/>
+        <img src="/rqweb/x6.png" class="carousel-img" alt="x图片 6"/>
+        <img src="/rqweb/x7.png" class="carousel-img" alt="x图片 7"/>
+        <img src="/rqweb/x8.png" class="carousel-img" alt="x图片 8"/>
+        <img src="/rqweb/x9.png" class="carousel-img" alt="x图片 9"/>
+        <img src="/rqweb/x10.png" class="carousel-img" alt="x图片 10"/>
+        <img src="/rqweb/x11.png" class="carousel-img" alt="x图片 11"/>
+        <img src="/rqweb/x12.png" class="carousel-img" alt="x图片 12"/>
+        <img src="/rqweb/x13.png" class="carousel-img" alt="x图片 13"/>
+        <img src="/rqweb/x14.png" class="carousel-img" alt="x图片 14"/>
+        <img src="/rqweb/x15.png" class="carousel-img" alt="x图片 15"/>
+      </div>
+    </div>
+    <div class="page page-4">
+      <img src="/rqweb/3.png" alt="背景图" />
+      <div class="overlay">
+        <div class="image-container">
+          <img id="t1" src="/rqweb/t2.png" alt="t2图片" />
+        </div>
+        <div class="text-container">
+          <h2 id="tm">Box office</h2>
+          <p id="fbt">Secret of Box Office</p>
+          <p id="wz">I have summarized the box office performance of Chinese films up to 2024, and identified some commonalities among Chinese high box office films by analyzing information such as genre, screening time, and actor director. I have also conducted a detailed analysis of the three highest grossing films</p>
+        </div>
+      </div>
+      <img src="/rqweb/t21.png" id="t21" alt="t21图片" style="position: absolute; top: 50%; left: 75%; transform: translate(-50%, -50%); width: 35%; height: auto; opacity: 0; z-index: 1; background: transparent !important;"/>
+      <img src="/rqweb/t22.png" id="t22" alt="t22图片" style="position: absolute; top: 50%; left: 75%; transform: translate(-50%, -50%); width: 35%; height: auto; opacity: 0; z-index: 1; background: transparent !important;"/>
+      <img src="/rqweb/t23.png" id="t23" alt="t23图片" style="position: absolute; top: 50%; left: 75%; transform: translate(-50%, -50%); width: 35%; height: auto; opacity: 0; z-index: 1; background: transparent !important;"/>
+      <img src="/rqweb/G3.png" id="l1" alt="蓝色圆球" style="position: absolute; top: 20%; left: 45%; transform: translateY(-50%); width: 10%; height: auto; z-index: 2; background: transparent !important;"/>
+      <img src="/rqweb/G3.png" id="l2" alt="蓝色圆球" style="position: absolute; top: 50%; left: 45%; transform: translateY(-50%); width: 10%; height: auto; z-index: 2; background: transparent !important;"/>
+      <img src="/rqweb/G3.png" id="l3" alt="蓝色圆球" style="position: absolute; top: 80%; left: 45%; transform: translateY(-50%); width: 10%; height: auto; z-index: 2; background: transparent !important;"/>
+    </div>
+    <div class="page page-5">
+      <img src="/rqweb/3.png" alt="第五页" />
+      <div class="overlay">
+        <div class="image-container">
+          <img id="t3" src="/rqweb/t3.jpg" alt="t3图片" style="position: absolute; top: 100%; transition: top 1s ease; left: 5%; width: 35%; height: auto;" />
+        </div>
+        <div class="text-container">
+          <h2 id="tm">Cultural composition</h2>
+          <p id="fbt">Animation integrates culture</p>
+          <p id="wz">I have summarized the box office performance of Chinese films up to 2024, and identified some commonalities among Chinese high box office films by analyzing information such as genre, screening time, and actor director. I have also conducted a detailed analysis of the three highest grossing films</p>
+        </div>
+    </div>
+  </div>
+  <div class="page page-6">
+    <img src="/rqweb/3.png" alt="第六页" />
+    <div class="overlay" style="position:relative;">
+      <div class="image-container page6-container">
+        <img id="t4" src="/rqweb/t4.png" alt="t4图片" style="z-index:2; opacity: 1; transition: opacity 0.5s; position: absolute; top: -15%; left: 5%; width: 90%; height: auto;">
+        <img id="t41" src="/rqweb/t41.png" alt="t41图片" style="z-index:3; opacity: 0; transition: opacity 0.5s; position: absolute; left: 5%; top: -15%; width: 90%; height: auto;">
+      </div>
+      <!-- <img id="page6-trigger" src="G4.png" alt="G4图片"/> -->
+      <div class="text-container">
+        <h2 id="tm6">Auxiliary food spoon</h2>
+        <p id="fbt6">———Odor changing spoon</p>
+        <p id="wz6">We have designed a scent magic, a complementary food spoon that can transmit odors. Through research, we have identified four of babies' favorite odors and created sachets to influence their perception of food taste and reduce picky eating habits</p>
+      </div>
+    </div>
+  </div>
+    <div class="page page-7">
+      <img src="/rqweb/3.png" alt="第七页" />
+      <div class="overlay" style="position:relative; display: flex; align-items: center; padding: 5%; box-sizing: border-box;">
+        <div class="image-container page7-container" style="flex: 0 0 40%; max-width: 40%; height: 80%; display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative;">
+          <img id="t5" src="/rqweb/t5.png" style="z-index:2; opacity:1; position:absolute; top:-15%; left:5%; width:90%; height:auto; transition: left 0.8s, opacity 0.5s;">
+          <img id="t51" src="/rqweb/t51.png" style="z-index:3; opacity:0; position:absolute; top:-15%; left:-100%; width:90%; height:auto; transition: left 0.8s, opacity 0.5s;">
+        </div>
+        <div class="text-container" style="flex-grow: 1; height: 100%; display: flex; flex-direction: column; justify-content: center; padding-left: 2%; box-sizing: border-box; transition: opacity 0.5s ease;">
+          <h2 id="tm7" style="font-family: 'xbiaoti'; color: rgb(239, 226, 205); font-size: 1.7rem; margin: 0; position: absolute; top: 6%; left: 42%; width: 70%; transition: all 0.8s ease; line-height: 1.2;">EcoFish</h2>
+          <p id="fbt7" style="font-family: 'neirong'; color: rgb(239, 226, 205); font-size: 0.6rem; top: 27%; font-weight: normal; left: 57%; line-height: 1.4; word-spacing: 0.1rem; transition: all 0.8s ease; width: 40%; margin: 0.1rem 0 0 0; position: absolute;">——Ecological Guardian</p>
+          <p id="wz7" style="font-family: 'neirong'; color: rgb(239, 214, 177); font-size: 0.5rem; top: 41%; font-weight: normal; left: 45%; transition: all 0.8s ease; line-height: 1.4; word-spacing: 0.1rem; width: 50%; opacity: 1; position: absolute; margin: 0.1rem 0 0 0;">In order to solve the problem of difficult pollution treatment in small lakes, we have designed an Ecofish cleaning device. Ecofish has a small volume and can pass through narrow water areas. It integrates functions such as crushing large garbage, settling sediment, and microbial purification to treat oil pollution in small lakes.</p>
+        </div>
+      </div>
+    </div>
+    <div class="page">
+      <img src="/rqweb/3.png" alt="第八页" />
+      <div class="overlay">
+        <h1 id="byebye-title">ByeBye</h1>
+      </div>
+    </div>
+  </div>
+</body>
+<script type="text/javascript">
+$(document).ready(function() {
+  // 初始化翻页效果
+  setBookFontSize();
+  $('#flipbook').turn({
+    display: 'single',
+    acceleration: true,
+    gradients: true,
+    elevation: 50,
+    when: {
+      turned: function(e, page) {
+        // 处理 t3 图片的动画
+        if (page === 5) {
+          setTimeout(function() {
+            $('#t3').css('top', '5.5%');
+          }, 1000);
+        } else {
+          $('#t3').css('top', '100%');
+        }
+      }
+    }
+  });
+
+  let page6MainVisible = true;
+  $('#page6-trigger').on('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    page6MainVisible = !page6MainVisible;
+    $('#page6-main').css('opacity', page6MainVisible ? '1' : '0');
+  });
+
+  // 修正翻页判断
+  $('#flipbook').on('click', function(e) {
+    if ($(e.target).is('#page6-trigger')) {
+      return;
+    }
+    var book = $(this);
+    var width = book.width();
+    var clickX = e.pageX - book.offset().left;
+    if (clickX < width / 2) {
+      book.turn('previous');
+    } else {
+      book.turn('next');
+    }
+  });
+
+  // Original t1 hover effect
+  const $t1 = $('#t1');
+  const $tm = $('#tm');
+  const $fbt = $('#fbt');
+  const $wz = $('#wz');
+  const $wz1 = $('#wz1');
+  const $imageContainer = $('.image-container');
+
+  $('.image-container').on('mouseenter', function () {
+    $t1.attr('src', '/rqweb/t12.png');
+    $tm.css('color', 'rgb(177, 239, 212)');
+    $fbt.css('color', 'rgb(177, 239, 212)');
+    $wz.css('opacity', '0');
+    $wz1.css('opacity', '1');
+  }).on('mouseleave', function () {
+    $t1.attr('src', '/rqweb/t1.png');
+    $tm.css('color', 'rgb(239, 226, 205)');
+    $fbt.css('color', 'rgb(239, 226, 205)');
+    $wz.css('opacity', '1');
+    $wz1.css('opacity', '0');
+  });
+
+  // New G1 hover effect and carousel
+  const $g1Img = $('#g1-img');
+  const $overlay = $('.page-3 .overlay');
+  const $carouselContainer = $('.carousel-container');
+  const $carouselImages = $('.carousel-container img');
+  let carouselInterval;
+  let currentImgIndex = 0;
+
+  $g1Img.on('mouseenter', function() {
+    // Hide the overlay content
+    $overlay.css('opacity', '0');
+
+    // Show the carousel container
+    $carouselContainer.css('opacity', '1');
+
+    // Start carousel from the first image
+    currentImgIndex = 0;
+    updateCarouselDisplay(currentImgIndex);
+
+    // Set interval for carousel transition
+    carouselInterval = setInterval(showNextCarouselImage, 1000); // 1 second interval
+  });
+
+  $g1Img.on('mouseleave', function() {
+    // Stop carousel
+    clearInterval(carouselInterval);
+
+    // Hide the carousel container
+    $carouselContainer.css('opacity', '0');
+
+    // Show the overlay content
+    $overlay.css('opacity', '1');
+  });
+
+  function updateCarouselDisplay(index) {
+    $carouselImages.removeClass('current side-right side-left far-right far-left').css('opacity', '0'); // Reset all images
+
+    const totalImages = $carouselImages.length;
+
+    // Get indices for the five images, handling loop
+    const currentIndex = index;
+    const next1Index = (index + 1) % totalImages;
+    const next2Index = (index + 2) % totalImages;
+    const prev1Index = (index - 1 + totalImages) % totalImages;
+    const prev2Index = (index - 2 + totalImages) % totalImages;
+
+    // Apply classes and styles based on position
+    $carouselImages.eq(currentIndex).addClass('current').css('opacity', '1');
+    $carouselImages.eq(next1Index).addClass('side-right').css('opacity', '0.5');
+    $carouselImages.eq(prev1Index).addClass('side-left').css('opacity', '0.5');
+    $carouselImages.eq(next2Index).addClass('far-right').css('opacity', '0.2');
+    $carouselImages.eq(prev2Index).addClass('far-left').css('opacity', '0.2');
+  }
+
+  function showNextCarouselImage() {
+    currentImgIndex++;
+    if (currentImgIndex >= $carouselImages.length) {
+      currentImgIndex = 0; // Loop back to the beginning
+    }
+    updateCarouselDisplay(currentImgIndex); // Update display for the new current index
+  }
+});
+
+function setBookFontSize() {
+  const book = document.getElementById('flipbook');
+  if (!book) return;
+  const bookHeight = book.offsetHeight;
+  document.documentElement.style.fontSize = (bookHeight / 12) + 'px';
+}
+
+window.addEventListener('resize', setBookFontSize);
+</script>
+<script>
+$(document).ready(function() {
+  // Get references to the blue circles and t2x images
+  const $l1 = $('#l1');
+  const $l2 = $('#l2');
+  const $l3 = $('#l3');
+  const $t21 = $('#t21');
+  const $t22 = $('#t22');
+  const $t23 = $('#t23');
+
+  // Click handler for l1
+  $l1.on('click', function(e) {
+    e.stopPropagation(); // Prevent event from bubbling up to flipbook
+    $t21.css('opacity', '1');
+    $t22.css('opacity', '0'); // Ensure others are hidden
+    $t23.css('opacity', '0');
+  });
+
+  // Click handler for l2
+  $l2.on('click', function(e) {
+    e.stopPropagation(); // Prevent event from bubbling up to flipbook
+    $t21.css('opacity', '0'); // Ensure others are hidden
+    $t22.css('opacity', '1');
+    $t23.css('opacity', '0');
+  });
+
+  // Click handler for l3
+  $l3.on('click', function(e) {
+    e.stopPropagation(); // Prevent event from bubbling up to flipbook
+    $t21.css('opacity', '0'); // Ensure others are hidden
+    $t22.css('opacity', '0');
+    $t23.css('opacity', '1');
+  });
+
+  
+  // Page-6 的点击和悬停效果
+  const $page6Container = $('.page6-container');
+  const $page6Trigger = $('#page6-trigger');
+  const $page6Overlay = $('#page6-overlay');
+  let page6OverlayVisible = false;
+
+  // 移除之前的悬停效果
+  $page6Container.off('mouseenter mouseleave');
+
+  // 点击触发效果
+  $page6Trigger.on('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    page6OverlayVisible = !page6OverlayVisible;
+    $page6Overlay.css('opacity', page6OverlayVisible ? '1' : '0');
+    return false;
+  });
+
+  // 确保点击事件不会冒泡到 flipbook
+  $page6Container.on('click', function(e) {
+    e.stopPropagation();
+    return false;
+  });
+});
+</script>
+<script>
+// 自动切换t4和t41的透明度
+let t4Visible = true;
+setInterval(function() {
+  t4Visible = !t4Visible;
+  $('#t4').css('opacity', t4Visible ? '1' : '0');
+  $('#t41').css('opacity', t4Visible ? '0' : '1');
+}, 2000);
+</script>
+<script>
+let t5Show = true;
+setInterval(function() {
+  if (t5Show) {
+    // t5从右出，t51从左进
+    $('#t5').css({left: '100%', opacity: 0});
+    $('#t51').css({left: '5%', opacity: 1});
+  } else {
+    // t51从右出，t5从左进
+    $('#t51').css({left: '100%', opacity: 0});
+    $('#t5').css({left: '5%', opacity: 1});
+  }
+  t5Show = !t5Show;
+}, 2000);
+</script>
+</html>
